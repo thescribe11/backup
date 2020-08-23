@@ -1,0 +1,24 @@
+#!/bin/bash
+echo "[INFO] Removing prior v4l2 webcams..." | lolcat
+sudo modprobe -r v4l2loopback
+echo "[INFO] Prior v4l2 webcams removed." | lolcat
+
+echo "[ALERT] Creating new v4l2 webcam..." | lolcat
+sudo modprobe v4l2loopback devices=1 video_nr=20 card_label="DALEKCAM" exclusive_caps=1
+"[ALERT] New v4l2 webcam created." | lolcat
+
+echo "[INFO] Building Python modules..." | lolcat
+python3 setup.py build_ext --inplace
+echo "[INFO] Python modules built." | lolcat
+
+echo "[INFO] Compiling program..." | lolcat
+python3 -m nuitka dalekcam.py
+echo "[INFO] Program compiled." | lolcat
+
+echo  "[INFO] Activating v4l2 webcam..." | lolcat
+./dalekcam.bin
+
+echo "" | lolcat
+echo "[*ALERT*] Webcam deactivated by user. Removing..." | lolcat
+sudo modprobe -r v4l2loopback
+echo "[INFO] V4l2 webcam removed." | lolcat
